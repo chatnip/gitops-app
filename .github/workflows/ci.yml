@@ -18,6 +18,9 @@ jobs:
   ci:
     name: Build and Push
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ./ops-app
     outputs:
       image-tag: ${{ steps.tag.outputs.tag }}
 
