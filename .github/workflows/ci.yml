@@ -9,7 +9,7 @@ on:
 env:
   DOCKERHUB_IMAGE: commcencer/gitops-app
   CONFIG_REPO: chatnip/gitops-config
-  CONFIG_REPO_PATH: apps/gitops-app/overlays
+  CONFIG_REPO_PATH: apps/spring-boot/overlays
 
 permissions:
   contents: read
@@ -84,7 +84,7 @@ jobs:
         run: |
           cd config-repo/${{ env.CONFIG_REPO_PATH }}/dev
           kustomize edit set image \
-            nginx=commcencer/gitops-app:$IMAGE_TAG
+            nginx:1.27=commcencer/gitops-app:$IMAGE_TAG
 
       - name: Config Repo 커밋 및 Push
         env:
