@@ -37,6 +37,9 @@ jobs:
       - name: 테스트 실행
         run: mvn test -q
 
+      - name: 빌드 (jar 생성)   # ← 이거 추가
+        run: mvn package -q -DskipTests
+
       - name: 이미지 태그 생성
         id: tag
         run: echo "tag=sha-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
