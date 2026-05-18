@@ -13,4 +13,9 @@ public class ApiOpsController {
     public String OpsTest() {
         return "Get - /api/ops";
     }
+    
+    @GetMapping("/version")
+    public String version() {
+        return "v1.0.0";
+    }
 }
