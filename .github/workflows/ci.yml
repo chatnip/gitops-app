@@ -1,15 +1,21 @@
+# gitops-app/.github/workflows/ci.yml
 name: CI Pipeline
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'ops-app/**'
+      - '.github/workflows/ci.yaml'
   pull_request:
     branches: [main]
+    paths:
+      - 'ops-app/**'
 
 env:
   DOCKERHUB_IMAGE: commcencer/gitops-app
   CONFIG_REPO: chatnip/gitops-config
-  CONFIG_REPO_PATH: apps/spring-boot/overlays
+  CONFIG_REPO_PATH: apps/gitops-app/overlays
 
 permissions:
   contents: read
@@ -18,9 +24,6 @@ jobs:
   ci:
     name: Build and Push
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: ./ops-app
     outputs:
       image-tag: ${{ steps.tag.outputs.tag }}
 
@@ -35,10 +38,8 @@ jobs:
           cache: 'maven'
 
       - name: 테스트 실행
+        working-directory: ops-app
         run: mvn test -q
-
-      - name: 빌드 (jar 생성)   # ← 이거 추가
-        run: mvn package -q -DskipTests
 
       - name: 이미지 태그 생성
         id: tag
@@ -51,6 +52,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker 빌드 및 Push
+        working-directory: ops-app
         env:
           IMAGE_TAG: ${{ steps.tag.outputs.tag }}
         run: |
@@ -74,7 +76,9 @@ jobs:
           path: config-repo
 
       - name: Kustomize 설치
-        uses: imranismail/setup-kustomize@v2
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
 
       - name: dev 이미지 태그 업데이트
         env:
@@ -82,7 +86,7 @@ jobs:
         run: |
           cd config-repo/${{ env.CONFIG_REPO_PATH }}/dev
           kustomize edit set image \
-            nginx:1.27=commcencer/gitops-app:$IMAGE_TAG
+            gitops-app=commcencer/gitops-app:$IMAGE_TAG
 
       - name: Config Repo 커밋 및 Push
         env:
