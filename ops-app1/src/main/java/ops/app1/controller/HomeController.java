@@ -15,7 +15,7 @@ public class HomeController {
     public String home(Model model) {
         model.addAttribute("appName", "ops-app1");
         model.addAttribute("profile", profile);
-        model.addAttribute("message", "Hello from ops-app1 v3.1 (" + profile + ")");
+        model.addAttribute("message", "Hello from ops-app1 v3.2 (" + profile + ")");
         return "home";
     }
 }
